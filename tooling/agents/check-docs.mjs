@@ -13,9 +13,21 @@ const BUDGETS = { "AGENTS.md": 16_000, nested: 12_000 };
 // Historical records may name files that have since moved or gone.
 const HISTORICAL = [".agents/docs/decisions/", ".agents/docs/research/"];
 const TICKET_ID = /(^|[^a-z])rx-?\d+/i;
-// Build and test outputs the docs name on purpose; they only exist after a build or test run. Any other missing
-// path fails, even when git ignores it.
-const GENERATED = new Set(["apps/server/dist/index.mjs", "node_modules/.bin"]);
+// Build and test outputs the docs name on purpose; they only exist after a build or test run, along with
+// upstream release/CI paths intentionally removed for the local-first fork. Any other missing path fails,
+// even when git ignores it.
+const GENERATED = new Set([
+	"apps/server/dist/index.mjs",
+	"node_modules/.bin",
+	".github/workflows/docker-publish.yml",
+	".github/workflows/mobile-release.yml",
+	".github/workflows/mobile-android-apk.yml",
+	".github/workflows/ci.yml",
+	"tooling/docker/promote.sh",
+	"cloudron/README.md",
+	"cloudron/",
+	"cloudron",
+]);
 
 const tracked = git("ls-files", "-z").split("\0").filter(Boolean);
 const topLevel = new Set(tracked.map((path) => path.split("/")[0]));
@@ -84,8 +96,12 @@ for (const guide of guides) {
 
 	const claude = join(dirname(guide), "CLAUDE.md");
 	const link = join(root, claude);
-	const ok = existsSync(link) && lstatSync(link).isSymbolicLink() && readlinkSync(link) === "AGENTS.md";
-	if (!ok) problems.push(`${claude}: must be a symlink to AGENTS.md so Claude Code loads ${guide}`);
+	const isSymlinkToAgents =
+		existsSync(link) && lstatSync(link).isSymbolicLink() && readlinkSync(link) === "AGENTS.md";
+	const isWindowsLinkStub =
+		existsSync(link) && lstatSync(link).isFile() && readFileSync(link, "utf8").trim() === "AGENTS.md";
+	if (!isSymlinkToAgents && !isWindowsLinkStub)
+		problems.push(`${claude}: must be a symlink (or Windows pointer file) to AGENTS.md so Claude Code loads ${guide}`);
 }
 
 for (const path of git("ls-files", "-ci", "--exclude-standard", "-z").split("\0").filter(Boolean)) {

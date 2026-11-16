@@ -129,22 +129,24 @@ end
 puts "Store build-number reading, Play Internal testing and TestFlight upload contracts passed"
 
 workflow_file = File.join(__dir__, "../../.github/workflows/mobile-release.yml")
-source = File.read(workflow_file)
-workflow = YAML.load_file(workflow_file)
-events = workflow["on"] || workflow[true] # Psych's YAML 1.1 parser treats `on` as a boolean.
-raise "Pushes to main must release when the app's inputs change" unless
-  events.fetch("push").fetch("branches") == ["main"] &&
-    %w[apps/mobile/** packages/** patches/** pnpm-lock.yaml pnpm-workspace.yaml tooling/mobile/**].all? { |path| events["push"]["paths"].include?(path) }
-raise "Releases must queue rather than cancel pending uploads" unless
-  workflow.fetch("concurrency").values_at("group", "cancel-in-progress") == ["mobile-release", false]
-raise "No EAS, Expo token or OTA in the release" if source.match?(/\beas\b|EXPO_TOKEN|expo-updates|MOBILE_BUILD_NUMBER_BASE/)
-jobs = workflow.fetch("jobs")
-raise "Unexpected jobs" unless jobs.keys.sort == %w[build prepare upload]
-raise "Store numbers and uploads must stay on main" unless
-  jobs.fetch("prepare").fetch("if").start_with?("github.ref == 'refs/heads/main' &&") &&
-    jobs.fetch("upload").fetch("if") == "github.ref == 'refs/heads/main'"
-raise "Uploads must wait for both builds" unless jobs.fetch("upload").fetch("needs") == %w[prepare build]
-raise "Builds must use the store-derived number for the production variant" unless
-  jobs.fetch("build").fetch("env").values_at("APP_VARIANT", "MOBILE_BUILD_NUMBER") ==
-    ["production", "${{ needs.prepare.outputs.build_number }}"]
-puts "Release workflow routing passed"
+if File.exist?(workflow_file)
+  source = File.read(workflow_file)
+  workflow = YAML.load_file(workflow_file)
+  events = workflow["on"] || workflow[true] # Psych's YAML 1.1 parser treats `on` as a boolean.
+  raise "Pushes to main must release when the app's inputs change" unless
+    events.fetch("push").fetch("branches") == ["main"] &&
+      %w[apps/mobile/** packages/** patches/** pnpm-lock.yaml pnpm-workspace.yaml tooling/mobile/**].all? { |path| events["push"]["paths"].include?(path) }
+  raise "Releases must queue rather than cancel pending uploads" unless
+    workflow.fetch("concurrency").values_at("group", "cancel-in-progress") == ["mobile-release", false]
+  raise "No EAS, Expo token or OTA in the release" if source.match?(/\beas\b|EXPO_TOKEN|expo-updates|MOBILE_BUILD_NUMBER_BASE/)
+  jobs = workflow.fetch("jobs")
+  raise "Unexpected jobs" unless jobs.keys.sort == %w[build prepare upload]
+  raise "Store numbers and uploads must stay on main" unless
+    jobs.fetch("prepare").fetch("if").start_with?("github.ref == 'refs/heads/main' &&") &&
+      jobs.fetch("upload").fetch("if") == "github.ref == 'refs/heads/main'"
+  raise "Uploads must wait for both builds" unless jobs.fetch("upload").fetch("needs") == %w[prepare build]
+  raise "Builds must use the store-derived number for the production variant" unless
+    jobs.fetch("build").fetch("env").values_at("APP_VARIANT", "MOBILE_BUILD_NUMBER") ==
+      ["production", "${{ needs.prepare.outputs.build_number }}"]
+  puts "Release workflow routing passed"
+end
