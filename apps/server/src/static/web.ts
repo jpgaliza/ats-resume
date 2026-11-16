@@ -84,7 +84,7 @@ export function contentSecurityPolicy(html = "") {
 	const hashes = [...inlineScripts].map(
 		([, body]) =>
 			`'sha256-${createHash("sha256")
-				.update(body ?? "")
+				.update((body ?? "").replaceAll("\r\n", "\n"))
 				.digest("base64")}'`,
 	);
 	return [
@@ -143,6 +143,7 @@ function htmlResponse(html: string, headers: Record<string, string>, template = 
 	return new Response(body, {
 		headers: {
 			...headers,
+			"Cache-Control": headers["Cache-Control"] ?? "no-store",
 			Link: [headers.Link, ...preloadLinks(template)].filter(Boolean).join(", "),
 			// Pages name the current build's assets, so a release purges this tag from Cloudflare's cache
 			// (.github/workflows/docker-publish.yml).
