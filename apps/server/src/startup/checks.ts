@@ -6,6 +6,8 @@ import { fileURLToPath } from "node:url";
 import { drizzle } from "drizzle-orm/node-postgres";
 import { migrate } from "drizzle-orm/node-postgres/migrator";
 import { Pool } from "pg";
+import { getPool } from "@reactive-resume/db/client";
+import { runMigrations } from "@reactive-resume/db/migrate";
 import { env } from "@reactive-resume/env/server";
 import { getLocalDataDirectory } from "@reactive-resume/utils/monorepo.node";
 import { verifyMigratedSchema } from "./schema-check";
@@ -43,6 +45,23 @@ function lockConflictCode(error: unknown): string | undefined {
 
 export async function runDatabaseMigrations() {
 	console.info("Running database migrations...");
+	const migrationsFolder = resolveWorkspaceFolder("migrations");
+
+	if (env.DATABASE_URL.startsWith("pglite://")) {
+		await runMigrations(migrationsFolder);
+		console.info("Database migrations completed (PGlite)");
+
+		try {
+			await verifyMigratedSchema(getPool());
+		} catch (error) {
+			console.error("Database schema verification failed", { error });
+			if (env.STRICT_SCHEMA_CHECK) throw error;
+			console.error(
+				"Continuing with a drifted database schema; set STRICT_SCHEMA_CHECK=true to refuse startup instead.",
+			);
+		}
+		return;
+	}
 
 	const pool = new Pool({
 		connectionString: env.DATABASE_MIGRATION_URL ?? env.DATABASE_URL,
@@ -56,10 +75,10 @@ export async function runDatabaseMigrations() {
 			await client.query("SELECT pg_advisory_lock(721830451)");
 			// A waiting ALTER queues every later query on its table, so give up quickly and retry instead.
 			await client.query("SET lock_timeout = '5s'");
-			const db = drizzle({ client });
+			const pgDb = drizzle({ client });
 			for (let attempt = 1; ; attempt += 1) {
 				try {
-					await migrate(db, { migrationsFolder: resolveWorkspaceFolder("migrations") });
+					await migrate(pgDb, { migrationsFolder });
 					console.info("Database migrations completed");
 					break;
 				} catch (error) {

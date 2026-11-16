@@ -27,13 +27,23 @@ const GENERATED = new Set([
 	"cloudron/README.md",
 	"cloudron/",
 	"cloudron",
+	"vercel.json",
+	"wrangler.jsonc",
+	"apps/server/src/vercel.ts",
+	"apps/server/vercel.mjs",
+	"apps/mobile",
+	"tooling/mobile",
+	"tooling/cloudflare",
+	"apps/server/src/cloudflare",
 ]);
+
+const IGNORED_PREFIXES = ["apps/mobile/", "tooling/mobile/", "tooling/cloudflare/", "apps/server/src/cloudflare/"];
 
 const tracked = git("ls-files", "-z").split("\0").filter(Boolean);
 const topLevel = new Set(tracked.map((path) => path.split("/")[0]));
 const problems = [];
 
-const guides = tracked.filter((path) => basename(path) === "AGENTS.md");
+const guides = tracked.filter((path) => basename(path) === "AGENTS.md" && existsSync(join(root, path)));
 const docs = [
 	...guides,
 	"CODING_STANDARDS.md",
@@ -82,8 +92,10 @@ for (const doc of docs) {
 	const markdown = readFileSync(join(root, doc), "utf8");
 	const missing = new Set();
 	for (const path of [...candidatePaths(markdown), ...relativeLinks(markdown, doc)]) {
+		const normalized = path.replaceAll("\\", "/");
 		const found = existsSync(join(root, path)) || existsSync(join(root, dirname(doc), path));
-		if (!found && !GENERATED.has(path)) missing.add(path);
+		const ignored = GENERATED.has(normalized) || IGNORED_PREFIXES.some((prefix) => normalized.startsWith(prefix));
+		if (!found && !ignored) missing.add(path);
 	}
 	for (const path of missing) problems.push(`${doc}: names \`${path}\`, which doesn't exist`);
 }
@@ -96,8 +108,7 @@ for (const guide of guides) {
 
 	const claude = join(dirname(guide), "CLAUDE.md");
 	const link = join(root, claude);
-	const isSymlinkToAgents =
-		existsSync(link) && lstatSync(link).isSymbolicLink() && readlinkSync(link) === "AGENTS.md";
+	const isSymlinkToAgents = existsSync(link) && lstatSync(link).isSymbolicLink() && readlinkSync(link) === "AGENTS.md";
 	const isWindowsLinkStub =
 		existsSync(link) && lstatSync(link).isFile() && readFileSync(link, "utf8").trim() === "AGENTS.md";
 	if (!isSymlinkToAgents && !isWindowsLinkStub)

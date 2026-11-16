@@ -1,3 +1,22 @@
+/** Normalize OpenAI-compatible base URLs so bare hosts like http://127.0.0.1 resolve to /v1. */
+export function normalizeOpenAIBaseUrl(baseURL: string | undefined): string | undefined {
+	const trimmed = baseURL?.trim();
+	if (!trimmed) return undefined;
+	try {
+		const parsed = new URL(trimmed);
+		if (
+			(parsed.protocol === "http:" || parsed.protocol === "https:") &&
+			(parsed.pathname === "" || parsed.pathname === "/")
+		) {
+			parsed.pathname = "/v1";
+			return parsed.toString().replace(/\/+$/, "");
+		}
+		return trimmed.replace(/\/+$/, "");
+	} catch {
+		return trimmed;
+	}
+}
+
 /** Normalize deployment-provided aliases without overriding explicit settings. */
 export function deploymentEnvironment(input: NodeJS.ProcessEnv): NodeJS.ProcessEnv {
 	const value = (key: string) => input[key]?.trim() || undefined;
@@ -9,6 +28,11 @@ export function deploymentEnvironment(input: NodeJS.ProcessEnv): NodeJS.ProcessE
 			: value("VERCEL_URL");
 	const appUrl = value("APP_URL") ?? (vercel && hostname ? `https://${hostname}` : undefined);
 	const hasS3 = value("S3_ACCESS_KEY_ID") && value("S3_SECRET_ACCESS_KEY") && value("S3_BUCKET");
+	const aiModel = value("AI_MODEL") ?? value("AI_MODEL_NAME");
+	const aiBaseUrl = value("AI_BASE_URL");
+	const aiProvider = value("AI_PROVIDER") ?? (aiBaseUrl || aiModel ? "openai-compatible" : undefined);
+	const normalizedAiBaseUrl = aiProvider === "openai-compatible" ? normalizeOpenAIBaseUrl(aiBaseUrl) : aiBaseUrl;
+
 	// Cloudron addons supply their own variable names: https://docs.cloudron.io/packaging/addons
 	const mailFrom = value("CLOUDRON_MAIL_FROM");
 	const cloudron: Record<string, string | undefined> =
@@ -32,7 +56,6 @@ export function deploymentEnvironment(input: NodeJS.ProcessEnv): NodeJS.ProcessE
 	return {
 		...input,
 		APP_URL: appUrl,
-		// Hyperdrive's actual URL is supplied to the request-scoped pool, never shared across requests.
 		DATABASE_URL:
 			value("DATABASE_URL") ?? (cloudflare ? "postgresql://hyperdrive" : vercel ? value("POSTGRES_URL") : undefined),
 		DATABASE_MIGRATION_URL:
@@ -47,6 +70,12 @@ export function deploymentEnvironment(input: NodeJS.ProcessEnv): NodeJS.ProcessE
 					? (value("VERCEL_BRANCH_URL") ?? hostname ?? "preview")
 					: "production"
 				: "default"),
+		AI_PROVIDER: aiProvider,
+		AI_MODEL: aiModel,
+		AI_MODEL_NAME: value("AI_MODEL_NAME") ?? aiModel,
+		AI_BASE_URL: normalizedAiBaseUrl,
+		FLAG_ALLOW_UNSAFE_AI_BASE_URL: value("FLAG_ALLOW_UNSAFE_AI_BASE_URL") ?? "true",
+		FLAG_DISABLE_API_RATE_LIMIT: value("FLAG_DISABLE_API_RATE_LIMIT") ?? "true",
 		...Object.fromEntries(Object.entries(cloudron).map(([key, alias]) => [key, value(key) ?? alias])),
 	};
 }

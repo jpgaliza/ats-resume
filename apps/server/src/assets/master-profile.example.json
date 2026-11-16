@@ -1,0 +1,286 @@
+{
+	"basics": {
+		"name": "Seu Nome Completo",
+		"headline": "Fullstack | Front-End | Back-End | Engenharia de Software",
+		"email": "seuemail@exemplo.com",
+		"phone": "(00) 00000-0000",
+		"location": "Cidade - UF, Brasil",
+		"website": {
+			"url": "https://www.linkedin.com/in/seuperfil/",
+			"label": "Linkedin"
+		},
+		"customFields": [
+			{
+				"id": "xqppiwv8fy698kfrmnz6cz4s",
+				"icon": "link",
+				"text": "Github",
+				"link": "https://github.com/seuperfil"
+			}
+		]
+	},
+	"summary": {
+		"title": "RESUMO",
+		"icon": "",
+		"columns": 1,
+		"hidden": false,
+		"keepTogether": false,
+		"startOnNewPage": false,
+		"content": "<p>Breve resumo profissional destacando sua formação, stacks principais e diferenciais técnicos voltados para a área de atuação.</p>"
+	},
+	"sections": {
+		"profiles": {
+			"title": "Profiles",
+			"icon": "",
+			"columns": 1,
+			"hidden": true,
+			"keepTogether": false,
+			"startOnNewPage": false,
+			"items": []
+		},
+		"experience": {
+			"title": "EXPERIÊNCIA",
+			"icon": "",
+			"columns": 1,
+			"hidden": false,
+			"keepTogether": false,
+			"startOnNewPage": false,
+			"items": [
+				{
+					"id": "01a01b8c-9e59-721c-8631-1199aa8b9992",
+					"hidden": false,
+					"company": "Nome da Empresa ou Projeto",
+					"position": "Cargo ou Posição",
+					"location": "Cidade - UF",
+					"period": "2024 - Presente",
+					"website": {
+						"url": "",
+						"label": "",
+						"inlineLink": false
+					},
+					"description": "<p>Descrição das atividades desenvolvidas, tecnologias empregadas e impacto mensurável gerado.</p>",
+					"roles": []
+				}
+			]
+		},
+		"education": {
+			"title": "FORMAÇÃO",
+			"icon": "",
+			"columns": 1,
+			"hidden": false,
+			"keepTogether": false,
+			"startOnNewPage": false,
+			"items": [
+				{
+					"id": "vz0m5bn1xxgt1sw5hjfgll0x",
+					"hidden": false,
+					"school": "Nome da Universidade ou Instituição",
+					"degree": "Curso de Graduação",
+					"area": "Ênfase do curso e áreas de aprofundamento.",
+					"grade": "Bacharelado",
+					"location": "Cidade - UF",
+					"period": "2024 - 2027",
+					"website": {
+						"url": "",
+						"label": "",
+						"inlineLink": false
+					},
+					"description": ""
+				}
+			]
+		},
+		"projects": {
+			"title": "PROJETOS",
+			"icon": "",
+			"columns": 1,
+			"hidden": false,
+			"keepTogether": false,
+			"startOnNewPage": false,
+			"items": [
+				{
+					"id": "019d2fc3-503d-7796-9214-17bbfb09bdd2",
+					"hidden": false,
+					"name": "Nome do Projeto 1 | Stack Principal",
+					"period": "2024",
+					"website": {
+						"url": "https://seulink-demo.com",
+						"label": "Demo",
+						"inlineLink": true
+					},
+					"description": "<p>Descrição do projeto demonstrando problema resolvido, arquitetura e tecnologias aplicadas.</p>"
+				}
+			]
+		},
+		"skills": {
+			"title": "HABILIDADES",
+			"icon": "",
+			"columns": 4,
+			"hidden": false,
+			"keepTogether": false,
+			"startOnNewPage": false,
+			"items": [
+				{
+					"id": "iplp0xzghyap4jvx6cycphyj",
+					"hidden": false,
+					"icon": "",
+					"iconColor": "",
+					"name": "Linguagens:",
+					"proficiency": "JavaScript, TypeScript, Python, SQL",
+					"level": 0,
+					"keywords": []
+				},
+				{
+					"id": "e21tyqqvofziev6nmnuvm511",
+					"hidden": false,
+					"icon": "",
+					"iconColor": "",
+					"name": "Frameworks & Web:",
+					"proficiency": "React, Next.js, Laravel, Tailwind CSS",
+					"level": 0,
+					"keywords": []
+				}
+			],
+			"keywordLayout": "inline",
+			"layout": "default"
+		},
+		"languages": {
+			"title": "IDIOMAS",
+			"icon": "",
+			"columns": 2,
+			"hidden": false,
+			"keepTogether": false,
+			"startOnNewPage": false,
+			"items": [
+				{
+					"id": "e6o8tw0tfrxavbf7s0t50ck9",
+					"hidden": false,
+					"language": "Português",
+					"fluency": "Nativo",
+					"level": 0
+				},
+				{
+					"id": "lv3bd8g1j7vno76qem8y5as3",
+					"hidden": false,
+					"language": "Inglês",
+					"fluency": "Avançado",
+					"level": 0
+				}
+			]
+		},
+		"interests": {
+			"title": "Interests",
+			"icon": "",
+			"columns": 1,
+			"hidden": true,
+			"keepTogether": false,
+			"startOnNewPage": false,
+			"items": []
+		},
+		"awards": {
+			"title": "Awards",
+			"icon": "",
+			"columns": 1,
+			"hidden": true,
+			"keepTogether": false,
+			"startOnNewPage": false,
+			"items": []
+		},
+		"certifications": {
+			"title": "CERTIFICAÇÕES",
+			"icon": "",
+			"columns": 1,
+			"hidden": true,
+			"keepTogether": false,
+			"startOnNewPage": false,
+			"items": []
+		},
+		"publications": {
+			"title": "CURSOS E CERTIFICAÇÕES",
+			"icon": "",
+			"columns": 4,
+			"hidden": false,
+			"keepTogether": false,
+			"startOnNewPage": false,
+			"items": [
+				{
+					"id": "apn4qxmpbwwaofq6l80oqj73",
+					"hidden": false,
+					"title": "Nome do Curso ou Certificação",
+					"publisher": "Instituição Emissora (Ano)",
+					"date": "",
+					"website": { "url": "", "label": "", "inlineLink": false },
+					"description": ""
+				}
+			]
+		},
+		"volunteer": {
+			"title": "Volunteering",
+			"icon": "",
+			"columns": 1,
+			"hidden": true,
+			"keepTogether": false,
+			"startOnNewPage": false,
+			"items": []
+		},
+		"references": {
+			"title": "References",
+			"icon": "",
+			"columns": 1,
+			"hidden": true,
+			"keepTogether": false,
+			"startOnNewPage": false,
+			"items": []
+		}
+	},
+	"customSections": [],
+	"metadata": {
+		"template": "rhyhorn",
+		"layout": {
+			"sidebarWidth": 35,
+			"pages": [
+				{
+					"fullWidth": false,
+					"main": ["summary", "education", "experience", "projects", "skills", "publications", "languages"],
+					"sidebar": []
+				}
+			]
+		},
+		"page": {
+			"gapX": 4,
+			"gapY": 6,
+			"marginX": 18,
+			"marginY": 18,
+			"format": "a4",
+			"locale": "pt-BR",
+			"hideLinkUnderline": false,
+			"hideIcons": false,
+			"hideSectionIcons": true
+		},
+		"design": {
+			"level": {
+				"icon": "star",
+				"type": "circle"
+			},
+			"colors": {
+				"primary": "rgba(82, 82, 92, 1)",
+				"text": "rgb(23, 19, 19)",
+				"background": "rgba(255, 255, 255, 1)"
+			}
+		},
+		"typography": {
+			"body": {
+				"fontFamily": "PT Sans",
+				"fontWeights": ["400"],
+				"fontSize": 8.5,
+				"lineHeight": 1.5
+			},
+			"heading": {
+				"fontFamily": "PT Sans",
+				"fontWeights": ["600"],
+				"fontSize": 11.5,
+				"lineHeight": 1.5
+			}
+		},
+		"notes": "",
+		"styleRules": []
+	}
+}

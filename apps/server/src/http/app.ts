@@ -39,6 +39,7 @@ import { handleCustomDomain, handleTraefikProvider } from "./custom-domain";
 import { handleHealth } from "./health";
 import { handlePublicResumeDownload } from "./public-resume-download";
 import { handleResumePdfDownload } from "./resume-pdf";
+import { handleForkWithData, handleTailorPreview } from "./tailor";
 
 type ServerEnvironment = { Bindings: HttpBindings | Http2Bindings };
 
@@ -139,6 +140,18 @@ export function createApp(options: AppOptions = {}) {
 		handlePublicResumeDownload(c.req.raw, c.req.param("username"), c.req.param("slug"), client(c), "docx"),
 	);
 	app.get("/api/resumes/:id/pdf", (c) => handleResumePdfDownload(c.req.raw, c.req.param("id")));
+	app.post("/api/resume/:id/tailor-preview", limitBody(2 * 1024 * 1024), (c) =>
+		handleTailorPreview(c.req.raw, c.req.param("id")),
+	);
+	app.post("/api/resumes/:id/tailor-preview", limitBody(2 * 1024 * 1024), (c) =>
+		handleTailorPreview(c.req.raw, c.req.param("id")),
+	);
+	app.post("/api/resume/:id/fork-with-data", limitBody(4 * 1024 * 1024), (c) =>
+		handleForkWithData(c.req.raw, c.req.param("id")),
+	);
+	app.post("/api/resumes/:id/fork-with-data", limitBody(4 * 1024 * 1024), (c) =>
+		handleForkWithData(c.req.raw, c.req.param("id")),
+	);
 	// Outside /api/resumes, which robots.txt keeps crawlers out of: link previews need to fetch these.
 	app.get("/cards/:username/:file{.+\\.png}", (c) =>
 		handleResumeCard(c.req.raw, c.req.param("username"), c.req.param("file").slice(0, -".png".length)),

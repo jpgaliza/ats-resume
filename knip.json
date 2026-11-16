@@ -2,17 +2,9 @@
 	"$schema": "https://unpkg.com/knip@6/schema.json",
 	"tags": ["-lintignore"],
 	"ignoreBinaries": ["pdftotext", "mktemp"],
-	"ignoreIssues": {
-		"apps/mobile/src/**": ["exports", "types", "duplicates"]
-	},
 	"workspaces": {
 		".": {
 			"entry": ["tests/e2e/autofill-prototype.mjs"]
-		},
-		"apps/mobile": {
-			"ignoreExportsUsedInFile": true,
-			"entry": ["plugins/*.js", "scripts/**/*.mjs"],
-			"ignoreDependencies": ["babel-jest", "expo-task-manager", "expo-updates", "uuid"]
 		},
 		"apps/web": {
 			"entry": [
@@ -30,13 +22,7 @@
 			}
 		},
 		"apps/server": {
-			"entry": [
-				"vercel.mjs",
-				"src/prepare-deployment.ts",
-				"src/migrate-legacy-styles.ts",
-				"src/cloudflare/index.ts",
-				"src/cloudflare/sharp.ts"
-			],
+			"entry": ["src/prepare-deployment.ts", "src/migrate-legacy-styles.ts"],
 			"ignoreDependencies": [
 				"@ai-sdk/anthropic",
 				"@ai-sdk/cerebras",

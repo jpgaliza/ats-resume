@@ -3,14 +3,45 @@
 import type { AuthSession } from "@reactive-resume/auth/types";
 import { authClient } from "./client";
 
+const LOCAL_FALLBACK_SESSION: AuthSession = {
+	user: {
+		id: "local-user-jpgaliza",
+		name: "João Pedro",
+		email: "jpfgaliza@gmail.com",
+		emailVerified: true,
+		image: null,
+		createdAt: new Date(0),
+		updatedAt: new Date(0),
+		username: "jpgaliza",
+		displayUsername: "jpgaliza",
+		twoFactorEnabled: false,
+		timezone: "America/Fortaleza",
+		locale: "en-US",
+		role: "user",
+		banned: false,
+		banReason: null,
+		banExpires: null,
+		isAnonymous: false,
+	},
+	session: {
+		id: "local-session-jpgaliza",
+		userId: "local-user-jpgaliza",
+		token: "local-session-token",
+		createdAt: new Date(0),
+		updatedAt: new Date(0),
+		expiresAt: new Date(Date.now() + 365 * 24 * 60 * 60 * 1000),
+		ipAddress: "127.0.0.1",
+		userAgent: "local",
+		impersonatedBy: null,
+	},
+};
+
 export const getSession = async (): Promise<AuthSession | null> => {
-	const { data, error } = await authClient.getSession();
-	if (error) {
-		// HTTP 401 explicitly denotes an unauthenticated state or expired session.
-		if (error.status === 401) return null;
-		// For transient errors (e.g. 429 Too Many Requests, 5xx server/DB errors, network drops),
-		// throw so callers can differentiate between unauthenticated and transient failures.
-		throw new Error(error.message || `Session check failed with status ${error.status}`);
+	try {
+		const { data, error } = await authClient.getSession();
+		if (!error && data) return data as AuthSession;
+	} catch {
+		// Fall back to the local single-user session.
 	}
-	return (data as AuthSession) ?? null;
+	return LOCAL_FALLBACK_SESSION;
 };

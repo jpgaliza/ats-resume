@@ -73,7 +73,7 @@ export const env = createEnv({
 	server: {
 		// Application
 		CLOUDFLARE: z.stringbool().default(false),
-		APP_URL: z.url({ protocol: /https?/ }),
+		APP_URL: z.url({ protocol: /https?/ }).default("http://localhost:3000"),
 		APP_REVISION: z
 			.string()
 			.regex(/^[a-f0-9]{40}$/)
@@ -130,7 +130,15 @@ export const env = createEnv({
 		),
 
 		// Database
-		DATABASE_URL: z.url({ protocol: /postgres(ql)?/ }),
+		DATABASE_URL: z
+			.string()
+			.trim()
+			.min(1)
+			.refine(
+				(value) => /^postgres(?:ql)?:\/\//.test(value) || value.startsWith("pglite://"),
+				"DATABASE_URL must be a postgres(ql):// or pglite:// connection string",
+			)
+			.default("pglite://./data/pgdata"),
 		DATABASE_MIGRATION_URL: z.url({ protocol: /postgres(ql)?/ }).optional(),
 		DATABASE_POOL_MAX: z.coerce.number().int().min(1).max(100).default(10),
 		STRICT_SCHEMA_CHECK: z.stringbool().default(false),
@@ -140,6 +148,7 @@ export const env = createEnv({
 		AUTH_SECRET: z
 			.string()
 			.min(1)
+			.default("local-ats-resume-studio-auth-secret-key-32chars")
 			.refine((value) => process.env.NODE_ENV !== "production" || value.length >= 32, {
 				message: "AUTH_SECRET must be at least 32 characters in production. Generate one with openssl rand -hex 32.",
 			}),
@@ -208,7 +217,10 @@ export const env = createEnv({
 			.url({ protocol: /redis(s)?/ })
 			.refine(hasCompleteUserinfo, REDIS_URL_USERINFO_MESSAGE)
 			.optional(),
-		ENCRYPTION_SECRET: z.string().min(32, "ENCRYPTION_SECRET must be at least 32 characters").optional(),
+		ENCRYPTION_SECRET: z
+			.string()
+			.min(32, "ENCRYPTION_SECRET must be at least 32 characters")
+			.default("local-ats-resume-studio-encryption-key-32chars"),
 		CRON_SECRET: z.string().min(16, "CRON_SECRET must be at least 16 characters").optional(),
 
 		// Optional search and enhanced reading; custom URLs are operator-controlled Firecrawl services.
@@ -219,8 +231,10 @@ export const env = createEnv({
 		WEB_SEARCH_SEARXNG_URL: z.url({ protocol: /^https?$/ }).optional(),
 		AI_PROVIDER: aiProviderSchema.optional(),
 		AI_MODEL: z.string().trim().min(1).optional(),
+		AI_MODEL_NAME: z.string().trim().min(1).optional(),
 		AI_API_KEY: z.string().trim().min(1).optional(),
 		AI_BASE_URL: z.url({ protocol: /^https?$/ }).optional(),
+		MASTER_PROFILE_PATH: z.string().trim().min(1).optional(),
 		// The Assistant's per-step and whole-run deadlines; raise them for slow local inference. Node's fetch gives up on a
 		// provider that sends nothing for 300 seconds, and the documented proxies wait as long, so a step can't usefully exceed it.
 		AI_AGENT_STEP_TIMEOUT_MS: z.coerce.number().int().positive().max(300_000).default(120_000),

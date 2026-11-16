@@ -12,6 +12,7 @@ import { DownloadButtons, EditorBarFrame } from "@/features/resume/editor/chrome
 import { useEditorMode } from "@/features/resume/editor/use-editor-mode";
 import { preloadDocumentExport, useResumeExport } from "@/features/resume/export/use-resume-export";
 import { ResumeDownloadMenu } from "@/features/resume/share/download-menu";
+import { TailorWithAiButton } from "@/features/resume/tailor/tailor-button";
 
 type EditorBarProps = {
 	layout: "desktop" | "tablet" | "mobile";
@@ -39,15 +40,18 @@ export function EditorBar({ layout, pinnable }: EditorBarProps) {
 			history={<UndoRedo />}
 			historyInPanel
 		>
-			<DownloadButtons
-				busy={isExporting}
-				onDownload={() => void onDownloadPDF()}
-				onPreload={preloadDocumentExport}
-				compact={layout === "mobile"}
-				iconOnly={layout === "tablet"}
-				disabled={offline}
-				renderMore={(button) => <ResumeDownloadMenu trigger={button} onReview={() => void setMode("check")} />}
-			/>
+			<div className="flex items-center gap-1.5">
+				<TailorWithAiButton resumeId={resume?.id} disabled={offline || !resume} compact={layout === "mobile"} />
+				<DownloadButtons
+					busy={isExporting}
+					onDownload={() => void onDownloadPDF()}
+					onPreload={preloadDocumentExport}
+					compact={layout === "mobile"}
+					iconOnly={layout === "tablet"}
+					disabled={offline}
+					renderMore={(button) => <ResumeDownloadMenu trigger={button} onReview={() => void setMode("check")} />}
+				/>
+			</div>
 		</EditorBarFrame>
 	);
 }

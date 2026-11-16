@@ -1,3 +1,4 @@
+import { existsSync } from "node:fs";
 import { readdir, readFile } from "node:fs/promises";
 import { dirname, extname, relative, resolve, sep } from "node:path";
 import { fileURLToPath } from "node:url";
@@ -61,7 +62,12 @@ export async function checkDocs(root) {
 			.map((message) => normalize(message.message)),
 	);
 	const sourcePaths = (
-		await Promise.all(["apps/web/src", "apps/mobile/src"].map((path) => files(resolve(root, path))))
+		await Promise.all(
+			["apps/web/src", "apps/mobile/src"]
+				.map((path) => resolve(root, path))
+				.filter((dir) => existsSync(dir))
+				.map((dir) => files(dir)),
+		)
 	).flat();
 	const source = normalize(
 		(

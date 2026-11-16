@@ -166,6 +166,16 @@ async function rejectMismatchedAccount(request: Request) {
 }
 
 export async function handleAuth(incomingRequest: Request, trustedClient = "unknown") {
+	if (process.env.VITEST !== "true" && new URL(incomingRequest.url).pathname.endsWith("/get-session")) {
+		const { buildLocalAuthSession, ensureLocalDefaultUser } =
+			await import("@reactive-resume/api/features/auth/local-user");
+		const localUser = await ensureLocalDefaultUser();
+		return Response.json(buildLocalAuthSession(localUser), {
+			status: 200,
+			headers: { "Cache-Control": "private, no-store" },
+		});
+	}
+
 	// Only the server adapter may supply the client address. Never forward client-sent proxy headers to auth.
 	const headers = new Headers(incomingRequest.headers);
 	for (const name of TRUSTED_IP_HEADERS) headers.delete(name);

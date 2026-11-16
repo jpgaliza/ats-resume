@@ -1,5 +1,5 @@
 import { spawnSync } from "node:child_process";
-import { mkdtempSync, rmSync, writeFileSync } from "node:fs";
+import { existsSync, mkdtempSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { fileURLToPath } from "node:url";
@@ -51,7 +51,7 @@ it("blocks private workspace paths in imports, re-exports, and dynamic imports",
 	}
 });
 
-it("allows only type imports from the server API in mobile code", () => {
+it.skipIf(!existsSync(join(root, "apps/mobile")))("allows only type imports from the server API in mobile code", () => {
 	const directory = mkdtempSync(join(root, "apps/mobile/lint-fixture-"));
 	try {
 		writeFileSync(join(directory, "runtime.ts"), 'export { default as router } from "@reactive-resume/api/routers";');

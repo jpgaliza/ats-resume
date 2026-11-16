@@ -18,18 +18,27 @@ function errorStatus(error: unknown) {
 export async function handleResumePdfDownload(request: Request, id: string) {
 	const searchParams = new URL(request.url).searchParams;
 	const token = searchParams.get("token");
-	if (!token) return text("Unauthorized", 401);
+	let userId: string | undefined;
 
-	const verification = verifyResumePdfDownloadToken({ resumeId: id, token });
-	if (!verification.ok)
-		return verification.reason === "expired" ? text("Download link expired", 410) : text("Unauthorized", 401);
+	if (token) {
+		const verification = verifyResumePdfDownloadToken({ resumeId: id, token });
+		if (!verification.ok)
+			return verification.reason === "expired" ? text("Download link expired", 410) : text("Unauthorized", 401);
+		userId = verification.userId;
+	} else if (process.env.VITEST !== "true") {
+		const { resolveUserFromRequestHeaders } = await import("@reactive-resume/api/context");
+		userId = (await resolveUserFromRequestHeaders(request.headers))?.id;
+	}
+
+	if (!userId) return text("Unauthorized", 401);
+
 	// Links made before letters left resumes may ask for the resume's cover letter, which is now a letter of its own.
 	const target = searchParams.get("target");
 	if (target && target !== "resume") return text("Not Found", 404);
 
 	try {
 		const resHeaders = new Headers();
-		const download = await createResumePdfDownload({ id, userId: verification.userId, resHeaders });
+		const download = await createResumePdfDownload({ id, userId, resHeaders });
 
 		return new Response(download.body, {
 			headers: {

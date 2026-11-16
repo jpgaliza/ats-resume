@@ -1,7 +1,7 @@
 import type { TsdownPlugin } from "vite-plus/pack";
 import { readdirSync, readFileSync } from "node:fs";
 import { createRequire } from "node:module";
-import { dirname, join, relative, resolve } from "node:path";
+import { dirname, isAbsolute, join, relative, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { defineConfig } from "vite-plus";
 
@@ -57,9 +57,10 @@ const shouldBundle = (id: string) =>
 
 const shouldExternalizeThirdParty = (id: string) => {
 	if (shouldBundle(id)) return false;
-	// Subpath imports (`#…`) are resolved by the workspace package that declares them, so they're bundled with it.
-	if (id.startsWith("@/") || id.startsWith("#") || id.startsWith(".") || id.startsWith("/") || id.startsWith("\0"))
+	// Subpath imports (`#…`) and already-resolved filesystem paths must never be emitted verbatim as external imports.
+	if (isAbsolute(id) || id.startsWith("@/") || id.startsWith("#") || id.startsWith(".") || id.startsWith("\0")) {
 		return false;
+	}
 
 	return true;
 };
@@ -126,7 +127,6 @@ export default defineConfig({
 	pack: {
 		entry: {
 			index: "src/index.ts",
-			vercel: "src/vercel.ts",
 			"prepare-deployment": "src/prepare-deployment.ts",
 			"migrate-legacy-styles": "src/migrate-legacy-styles.ts",
 		},

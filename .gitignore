@@ -67,9 +67,11 @@ temp
 .migration
 /plans
 
-# Local Storage Data
+# Local Storage Data & Personal Master Dossier
 /data
 /apps/web/data
+apps/server/src/assets/profile.md
+apps/server/src/assets/master-profile.json
 
 # Redesign handoff (design references, not source)
 /design_handoff_reactive_resume_redesign
