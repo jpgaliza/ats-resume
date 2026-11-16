@@ -413,6 +413,11 @@ export async function handleWebApp(request: Request, readFile: ReadWebFile = (pa
 	const requestedPath = requestUrl.pathname;
 	const pathname = requestedPath === "/index.html" ? "/" : requestedPath;
 
+	// Local-first studio: bypass the marketing landing page and auth screens straight to resumes.
+	if (process.env.VITEST !== "true" && (pathname === "/" || pathname === "/auth" || pathname.startsWith("/auth/"))) {
+		return new Response(null, { status: 302, headers: { Location: "/dashboard/resumes" } });
+	}
+
 	if (!isAppSectionPath(pathname) && isAssetPath(pathname)) {
 		return new Response("Not Found", { status: 404 });
 	}

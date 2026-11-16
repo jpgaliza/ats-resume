@@ -1,13 +1,21 @@
-import { createFileRoute } from "@tanstack/react-router";
-import { NotFoundScreen } from "@/components/layout/not-found-screen";
-import { AuthLayout } from "@/features/auth/layout";
+import { createFileRoute, redirect, useNavigate } from "@tanstack/react-router";
+import { useEffect } from "react";
 import { authSearchSchema } from "@/features/auth/redirect";
 import { createNoindexFollowMeta } from "@/libs/seo";
 
+function RedirectToResumes() {
+	const navigate = useNavigate();
+	useEffect(() => {
+		void navigate({ to: "/dashboard/resumes", replace: true });
+	}, [navigate]);
+	return null;
+}
+
 export const Route = createFileRoute("/auth")({
-	component: AuthLayout,
-	// The sign-in pages' frame already shows the logo.
-	notFoundComponent: () => <NotFoundScreen inLayout />,
+	beforeLoad: () => {
+		throw redirect({ to: "/dashboard/resumes", replace: true });
+	},
+	component: RedirectToResumes,
 	validateSearch: authSearchSchema,
 	head: () => ({
 		meta: [createNoindexFollowMeta()],

@@ -16,12 +16,11 @@ import { createMemoryHistory, createRootRoute, createRouter, RouterContextProvid
 import { renderToString } from "react-dom/server";
 import { isRTL, supportedLocales } from "@reactive-resume/utils/locale";
 import { MarketingLayout } from "./marketing-layout";
-import { Homepage } from "./page";
 import { AtsCheckerPage } from "@/features/ats-checker/page";
 import { TemplateGallery } from "@/features/templates/gallery";
 import { ThemeProvider } from "@/features/theme/provider";
 import { getLocaleMessages } from "@/libs/locale";
-import { getAtsCheckerMeta, getHomepageMeta, getTemplatesMeta } from "@/libs/seo";
+import { getAtsCheckerMeta, getTemplatesMeta } from "@/libs/seo";
 
 export const locales = supportedLocales;
 
@@ -29,7 +28,6 @@ export const locales = supportedLocales;
 const iconContextValue: IconProps = { size: 16, weight: "regular" };
 
 const pages = {
-	home: { path: "/", meta: getHomepageMeta, render: () => <Homepage /> },
 	"resume-templates": {
 		path: "/resume-templates",
 		meta: getTemplatesMeta,

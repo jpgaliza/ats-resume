@@ -2,7 +2,7 @@ import type { CSSProperties, ReactNode } from "react";
 import { i18n } from "@lingui/core";
 import { useLingui } from "@lingui/react";
 import { Trans } from "@lingui/react/macro";
-import { Link, useRouterState } from "@tanstack/react-router";
+import { Link } from "@tanstack/react-router";
 import { Icon } from "@reactive-resume/ui/components/icon";
 import { cn } from "@reactive-resume/utils/style";
 
@@ -11,15 +11,11 @@ export const labelClass = "font-martian font-medium text-[13px] leading-[1.4]";
 
 type CtaLinkProps = { size: "header" | "hero" | "closing"; className?: string };
 
-// Build-time prerender has no route matches; live routes carry the existing root session.
-const useSignedIn = () => useRouterState({ select: (state) => Boolean(state.matches.at(-1)?.context.session) });
-
-/** The main action in the header, hero and closing: start a resume or return to your dashboard. */
+/** The main action in the header, hero and closing: jump straight to the resume dashboard. */
 export function CtaLink({ size, className }: CtaLinkProps) {
-	const signedIn = useSignedIn();
 	return (
 		<Link
-			to={signedIn ? "/dashboard" : "/auth/register"}
+			to="/dashboard/resumes"
 			className={cn(
 				"inline-flex shrink-0 items-center rounded-lg bg-accent font-ui font-semibold text-on-accent transition-[background-color,transform] duration-[160ms] ease-out-strong hover:bg-accent-hover motion-safe:active:[transform:scale(.97)]",
 				size === "header" &&
@@ -29,23 +25,14 @@ export function CtaLink({ size, className }: CtaLinkProps) {
 				className,
 			)}
 		>
-			{signedIn ? <Trans>Go to dashboard</Trans> : <Trans>Build your resume</Trans>}
+			<Trans>Go to dashboard</Trans>
 			{size !== "header" && <Icon name="arrow-right" size={20} />}
 		</Link>
 	);
 }
 
 export function SignInLink() {
-	const signedIn = useSignedIn();
-	if (signedIn) return null;
-	return (
-		<Link
-			to="/auth/login"
-			className="touch-target relative inline-flex min-h-11 min-w-11 items-center justify-center rounded-sm px-2 font-ui text-sm font-medium text-ink-2 underline-offset-3 transition-colors hover:text-ink hover:underline max-[479px]:px-1 max-[479px]:text-xs"
-		>
-			<Trans>Sign in</Trans>
-		</Link>
-	);
+	return null;
 }
 
 type SceneCaptionProps = {
